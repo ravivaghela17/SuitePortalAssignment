@@ -22,8 +22,6 @@ export class AdminDao {
     return db.get('users');
   }
   async validateUser(email: string, password: string): Promise<Response> {
-    await db.read();
-
     const user = this.users.find({ email, password }).value();
 
     //user not found

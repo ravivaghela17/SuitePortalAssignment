@@ -55,7 +55,6 @@ export class MaintenanceRequestDao {
   }
 
   async getOpenMaintenances(): Promise<Response> {
-    await db.read();
     const requests = this.collection
       .filter({ status: ALL_REQUEST_STATUSES.open })
       .value();
@@ -81,8 +80,6 @@ export class MaintenanceRequestDao {
   }
 
   async getMaintenanceRequest(id: string): Promise<Response> {
-    await db.read();
-
     const request = this.collection.find({ id }).value();
     if (!request) {
       throw new HttpException(
@@ -105,8 +102,6 @@ export class MaintenanceRequestDao {
     };
   }
   async closeMaintenanceRequest(id: string): Promise<Response> {
-    await db.read();
-
     const request = this.collection.find({ id }).value();
 
     if (!request) {
