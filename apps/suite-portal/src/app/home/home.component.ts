@@ -12,7 +12,6 @@ import {
   NgForm,
 } from '@angular/forms';
 import { MaintenanceRequestApiService } from '../services/maintenance-api.service';
-import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import {
   SnackBarconfig,
   SNACK_BAR_TYPES,
@@ -37,8 +36,7 @@ export class HomeComponent implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     private readonly maintenanceRequestService: MaintenanceRequestApiService,
-    private readonly utilService: UtilService,
-    private readonly snackBar: MatSnackBar
+    private readonly utilService: UtilService
   ) {}
 
   ngOnInit(): void {
@@ -46,7 +44,10 @@ export class HomeComponent implements OnInit {
   }
   submitRequest() {
     if (!this.form.valid) {
-      this.openSnackBar(SNACK_BAR_TYPES.ERROR, ERROR_MESSAGES.REQUEST_FAILURE);
+      this.utilService.openSnackBar(
+        SNACK_BAR_TYPES.ERROR,
+        ERROR_MESSAGES.REQUEST_FAILURE
+      );
       return;
     }
     const saveModel = this.prepareMaintainceModel(this.form.value);
@@ -57,14 +58,17 @@ export class HomeComponent implements OnInit {
         first(),
         tap((response) => {
           if (response) {
-            this.openSnackBar(SNACK_BAR_TYPES.SUCCESS, REQUEST_SUCCECSS);
+            this.utilService.openSnackBar(
+              SNACK_BAR_TYPES.SUCCESS,
+              REQUEST_SUCCECSS
+            );
           }
         }),
         catchError((error) => {
           const errorMessage = error?.message
             ? error.message
             : ERROR_MESSAGES.REQUEST_FAILURE;
-          this.openSnackBar(SNACK_BAR_TYPES.ERROR, errorMessage);
+          this.utilService.openSnackBar(SNACK_BAR_TYPES.ERROR, errorMessage);
           return error;
         }),
         finalize(() => {
@@ -131,12 +135,5 @@ export class HomeComponent implements OnInit {
       summary: ['', [Validators.required]],
       details: [''],
     });
-  }
-  openSnackBar(snackBarType: string, message: string) {
-    const config = {
-      ...SnackBarconfig,
-      panelClass: snackBarType,
-    } as MatSnackBarConfig;
-    this.snackBar.open(message, '', config);
   }
 }

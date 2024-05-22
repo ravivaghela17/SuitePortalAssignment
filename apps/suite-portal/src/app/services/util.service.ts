@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { User, Response } from '@suiteportal/api-interfaces';
-import { ValidationError } from '@nestjs/common';
-import { ERROR_MESSAGES } from '../constants';
+
+import { ERROR_MESSAGES, SnackBarconfig } from '../constants';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UtilService {
+  constructor(private readonly snackBar: MatSnackBar) {}
   getRequiredFieldMessage(errors: any): string {
     return errors?.required ? ERROR_MESSAGES.REQUIRED_FIELD : '';
   }
@@ -18,5 +17,12 @@ export class UtilService {
       : errors.pattern
       ? ERROR_MESSAGES.EMAIL_PATTERN
       : '';
+  }
+  openSnackBar(snackBarType: string, message: string) {
+    const config = {
+      ...SnackBarconfig,
+      panelClass: snackBarType,
+    } as MatSnackBarConfig;
+    this.snackBar.open(message, '', config);
   }
 }

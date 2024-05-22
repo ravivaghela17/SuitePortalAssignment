@@ -6,8 +6,15 @@ import {
   Validators,
 } from '@angular/forms';
 import { AuthApiService } from '../../services/auth-api.service';
-import { REGEX_EMAIL_PATTERN, ERROR_MESSAGES } from '../../constants';
+import {
+  REGEX_EMAIL_PATTERN,
+  ERROR_MESSAGES,
+  SNACK_BAR_TYPES,
+} from '../../constants';
 import { UtilService } from '../../services/util.service';
+import { User } from '@suiteportal/api-interfaces';
+import { catchError, tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'sp-login',
@@ -19,6 +26,7 @@ export class LoginComponent implements OnInit {
   hidePassword = true;
   constructor(
     private readonly fb: FormBuilder,
+    private readonly router: Router,
     private readonly authApiService: AuthApiService,
     private readonly utilService: UtilService
   ) {}
@@ -26,7 +34,30 @@ export class LoginComponent implements OnInit {
     this.createForm();
   }
   login() {
-    this.authApiService.login(this.form.value).subscribe();
+    if (!this.form.valid) {
+      return;
+    }
+    const user: User = {
+      email: this.email.value,
+      password: this.password.value,
+    };
+    this.authApiService
+      .login(user)
+      .pipe(
+        tap((response) => {
+          if (response?.data) {
+            this.router.navigate([`/requests`]);
+          }
+        }),
+        catchError((error) => {
+          const errorMessage = error?.message
+            ? error.message
+            : ERROR_MESSAGES.REQUEST_FAILURE;
+          this.utilService.openSnackBar(SNACK_BAR_TYPES.ERROR, errorMessage);
+          return error;
+        })
+      )
+      .subscribe();
   }
   get password(): AbstractControl {
     return this.form.get('password');
