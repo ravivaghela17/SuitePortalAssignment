@@ -13,14 +13,15 @@ import {
 } from '@angular/forms';
 import { MaintenanceRequestApiService } from '../services/maintenance-api.service';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
-import { SnackBarconfig, SNACK_BAR_TYPES } from '../constants';
+import {
+  SnackBarconfig,
+  SNACK_BAR_TYPES,
+  ERROR_MESSAGES,
+  REGEX_EMAIL_PATTERN,
+} from '../constants';
 import { tap, first, catchError, finalize } from 'rxjs/operators';
+import { UtilService } from '../services/util.service';
 
-const ERROR_MESSAGES = {
-  REQUIRED_FIELD: 'This field is required',
-  EMAIL_PATTERN: 'Please enter a valid email address',
-  REQUEST_FAILURE: 'Unable to proceed the request, Please try again',
-};
 const REQUEST_SUCCECSS = 'Request submitted successfully!';
 @Component({
   selector: 'pm-home',
@@ -36,6 +37,7 @@ export class HomeComponent implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     private readonly maintenanceRequestService: MaintenanceRequestApiService,
+    private readonly utilService: UtilService,
     private readonly snackBar: MatSnackBar
   ) {}
 
@@ -95,15 +97,11 @@ export class HomeComponent implements OnInit {
   }
   getRequiredFieldMessage(field: string): string {
     const errors = this.form.get(field).errors;
-    return errors.required ? ERROR_MESSAGES.REQUIRED_FIELD : '';
+    return this.utilService.getRequiredFieldMessage(errors);
   }
   getEmailErrorMessage(): string {
     const errors = this.requesterEmail.errors;
-    return errors.required
-      ? ERROR_MESSAGES.REQUIRED_FIELD
-      : errors.pattern
-      ? ERROR_MESSAGES.EMAIL_PATTERN
-      : '';
+    return this.utilService.getEmailErrorMessage(errors);
   }
   private prepareMaintainceModel(formValues): MaintenanceRequest {
     const saveModel: MaintenanceRequest = {
@@ -127,10 +125,7 @@ export class HomeComponent implements OnInit {
       requesterName: ['', [Validators.required]],
       requesterEmail: [
         '',
-        [
-          Validators.required,
-          Validators.pattern('^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+$'),
-        ],
+        [Validators.required, Validators.pattern(REGEX_EMAIL_PATTERN)],
       ],
       serviceType: ['', [Validators.required]],
       summary: ['', [Validators.required]],
