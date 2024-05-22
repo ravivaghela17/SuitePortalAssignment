@@ -4,8 +4,10 @@ import { catchError, first, map, tap } from 'rxjs/operators';
 import { MaintenanceRequest, Response } from '@suiteportal/api-interfaces';
 import { ERROR_MESSAGES, SNACK_BAR_TYPES } from '../../constants';
 import { UtilService } from '../../services/util.service';
-import { Observable, of } from 'rxjs';
-
+import { BehaviorSubject, Observable, of } from 'rxjs';
+interface MaintenanceRequestModel extends MaintenanceRequest {
+  id: string;
+}
 @Component({
   selector: 'sp-request-list',
   templateUrl: './request-list.component.html',
@@ -21,7 +23,8 @@ export class RequestListComponent implements OnInit {
     'details',
     'action',
   ];
-  requestes$: Observable<MaintenanceRequest[]>;
+  private requestsSubject = new BehaviorSubject<MaintenanceRequestModel[]>([]);
+  public requests$ = this.requestsSubject.asObservable();
 
   constructor(
     private readonly utilService: UtilService,
@@ -29,7 +32,7 @@ export class RequestListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.requestes$ = this.getAllOpenMaintenanceRequests();
+    this.getAllOpenMaintenanceRequests();
   }
   closeRequest(id: string): void {
     if (!id) {
@@ -43,6 +46,15 @@ export class RequestListComponent implements OnInit {
       this.maintenanceRequestApiService
         .closeMaintenanceRequest(id)
         .pipe(
+          tap((response) => {
+            if (response) {
+              const currentRequests = this.requestsSubject.value;
+              const updatedRequests = currentRequests.filter(
+                (request) => request.id !== id
+              );
+              this.requestsSubject.next(updatedRequests);
+            }
+          }),
           catchError((error) => {
             const errorMessage = error?.message
               ? error.message
@@ -54,20 +66,26 @@ export class RequestListComponent implements OnInit {
         .subscribe();
     }
   }
-  getAllOpenMaintenanceRequests(): Observable<MaintenanceRequest[]> {
-    return this.maintenanceRequestApiService.getOpenMaintenanceRequest().pipe(
-      first(),
-      map(
-        (response: Response) =>
-          (response.data?.requests as MaintenanceRequest[]) ?? []
-      ),
-      catchError((error) => {
-        const errorMessage = error?.message
-          ? error.message
-          : ERROR_MESSAGES.REQUEST_FAILURE;
-        this.utilService.openSnackBar(SNACK_BAR_TYPES.ERROR, errorMessage);
-        return of([]);
-      })
-    );
+  getAllOpenMaintenanceRequests(): void {
+    this.maintenanceRequestApiService
+      .getOpenMaintenanceRequest()
+      .pipe(
+        first(),
+        map(
+          (response: Response) =>
+            (response.data?.requests as MaintenanceRequestModel[]) ?? []
+        ),
+        tap((requests: MaintenanceRequestModel[]) =>
+          this.requestsSubject.next(requests)
+        ),
+        catchError((error) => {
+          const errorMessage = error?.message
+            ? error.message
+            : ERROR_MESSAGES.REQUEST_FAILURE;
+          this.utilService.openSnackBar(SNACK_BAR_TYPES.ERROR, errorMessage);
+          return of([]);
+        })
+      )
+      .subscribe();
   }
 }
