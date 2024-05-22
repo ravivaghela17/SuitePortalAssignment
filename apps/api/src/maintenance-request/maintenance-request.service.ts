@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { MaintenanceRequest } from '@suiteportal/api-interfaces';
-import { MaintenanceRequestDao, MaintenanceRequestDB } from './maintenance-request.dao';
+import { MaintenanceRequest, Response } from '@suiteportal/api-interfaces';
+import {
+  MaintenanceRequestDao,
+  MaintenanceRequestDB,
+} from './maintenance-request.dao';
 
 @Injectable()
 export class MaintenanceRequestService {
-
-  constructor(
-    private readonly maintReqDao: MaintenanceRequestDao,
-  ) {
+  constructor(private readonly maintReqDao: MaintenanceRequestDao) {
     //
   }
 
@@ -15,7 +15,7 @@ export class MaintenanceRequestService {
     return await this.maintReqDao.insertNewRequest(maintenanceRequest);
   }
 
-  async getMaintenanceRequest(id: string): Promise<MaintenanceRequestDB> {
+  async getMaintenanceRequest(id: string): Promise<Response> {
     return await this.maintReqDao.getMaintenanceRequest(id);
   }
 }

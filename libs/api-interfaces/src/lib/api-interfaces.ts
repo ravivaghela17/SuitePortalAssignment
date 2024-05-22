@@ -31,9 +31,7 @@ export interface User {
   password: string;
 }
 export interface Response {
-  status: number;
   code: number;
   message: string;
-  userId: string;
   data: any;
 }

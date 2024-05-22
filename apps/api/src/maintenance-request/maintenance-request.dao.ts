@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { MaintenanceRequest } from '@suiteportal/api-interfaces';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { MaintenanceRequest, Response } from '@suiteportal/api-interfaces';
 import * as low from 'lowdb';
 import * as FileSync from 'lowdb/adapters/FileSync';
 import * as nanoid from 'nanoid';
+import { HTTP_CODES } from '../app/constants';
 
 export interface MaintenanceRequestDB extends MaintenanceRequest {
   id: string;
@@ -28,7 +29,9 @@ export class MaintenanceRequestDao {
     //
   }
 
-  async insertNewRequest(maintenanceRequest: MaintenanceRequest) {
+  async insertNewRequest(
+    maintenanceRequest: MaintenanceRequest
+  ): Promise<Response> {
     const id = { id: nanoid.nanoid(10) };
     await this.collection
       .push({
@@ -37,10 +40,38 @@ export class MaintenanceRequestDao {
         submittedAt: new Date(),
       })
       .write();
-    return id;
+
+    return {
+      code: HTTP_CODES[200].code,
+      message: HTTP_CODES[200].message,
+      data: {
+        id: id,
+      },
+    };
   }
 
-  async getMaintenanceRequest(id: string): Promise<MaintenanceRequestDB> {
-    return await this.collection.find({ id }).value();
+  async getMaintenanceRequest(id: string): Promise<Response> {
+    await db.read();
+
+    const request = this.collection.find({ id }).value();
+    if (!request) {
+      throw new HttpException(
+        {
+          code: HTTP_CODES[404].code,
+          message: HTTP_CODES[404].message,
+          data: {
+            id: id,
+          },
+        },
+        HttpStatus.NOT_FOUND
+      );
+    }
+    return {
+      code: HTTP_CODES[200].code,
+      message: HTTP_CODES[200].message,
+      data: {
+        request: request,
+      },
+    };
   }
 }
