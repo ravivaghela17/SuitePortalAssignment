@@ -53,6 +53,9 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
         </table>
+        <div *ngIf="!(requests$ | async)?.length" class="full-width">
+          <p class="empty-message">No Maintenance Request Available</p>
+        </div>
       </mat-card-content>
     </mat-card>
   </mat-grid-tile>
