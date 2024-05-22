@@ -12,16 +12,25 @@
           <mat-form-field>
             <mat-label>Apartment Unit #</mat-label>
             <input matInput type="text" formControlName="unitNumber" />
+            <mat-error *ngIf="unitNumber.touched && unitNumber.invalid">
+              {{ getRequiredFieldMessage('unitNumber') }}
+            </mat-error>
           </mat-form-field>
 
           <mat-form-field>
             <mat-label>Requester Name</mat-label>
             <input matInput type="text" formControlName="requesterName" />
+            <mat-error *ngIf="requesterName.touched && requesterName.invalid">
+              {{ getRequiredFieldMessage('requesterName') }}
+            </mat-error>
           </mat-form-field>
 
           <mat-form-field>
             <mat-label>Requester Email</mat-label>
             <input matInput type="email" formControlName="requesterEmail" />
+            <mat-error *ngIf="requesterEmail.touched && requesterEmail.invalid">
+              {{ getEmailErrorMessage() }}
+            </mat-error>
           </mat-form-field>
 
           <mat-form-field>
@@ -34,11 +43,17 @@
                 {{ serviceType }}
               </mat-option>
             </mat-select>
+            <mat-error *ngIf="serviceType.touched && serviceType.invalid">
+              {{ getRequiredFieldMessage('serviceType') }}
+            </mat-error>
           </mat-form-field>
 
           <mat-form-field>
             <mat-label>Summary</mat-label>
             <input matInput type="text" formControlName="summary" />
+            <mat-error *ngIf="summary.touched && summary.invalid">
+              {{ getRequiredFieldMessage('summary') }}
+            </mat-error>
           </mat-form-field>
 
           <mat-form-field>
@@ -46,7 +61,7 @@
             <textarea matInput formControlName="details"></textarea>
           </mat-form-field>
 
-          <button mat-raised-button color="accent">
+          <button mat-raised-button color="accent" [disabled]="!form.valid">
             Submit
           </button>
         </form>
