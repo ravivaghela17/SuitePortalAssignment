@@ -50,6 +50,30 @@ export class MaintenanceRequestDao {
     };
   }
 
+  async getOpenMaintenances(): Promise<Response> {
+    await db.read();
+    const requests = this.collection.value();
+    if (!requests) {
+      throw new HttpException(
+        {
+          code: HTTP_CODES[404].code,
+          message: HTTP_CODES[404].message,
+          data: {
+            requests: [],
+          },
+        },
+        HttpStatus.NOT_FOUND
+      );
+    }
+    return {
+      code: HTTP_CODES[200].code,
+      message: HTTP_CODES[200].message,
+      data: {
+        requests: requests,
+      },
+    };
+  }
+
   async getMaintenanceRequest(id: string): Promise<Response> {
     await db.read();
 
