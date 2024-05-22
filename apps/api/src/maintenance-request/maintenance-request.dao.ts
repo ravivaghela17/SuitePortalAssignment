@@ -1,5 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { MaintenanceRequest, Response } from '@suiteportal/api-interfaces';
+import {
+  MaintenanceRequest,
+  Response,
+  ALL_REQUEST_STATUSES,
+} from '@suiteportal/api-interfaces';
 import * as low from 'lowdb';
 import * as FileSync from 'lowdb/adapters/FileSync';
 import * as nanoid from 'nanoid';
@@ -52,7 +56,9 @@ export class MaintenanceRequestDao {
 
   async getOpenMaintenances(): Promise<Response> {
     await db.read();
-    const requests = this.collection.value();
+    const requests = this.collection
+      .filter({ status: ALL_REQUEST_STATUSES.open })
+      .value();
     if (!requests) {
       throw new HttpException(
         {
@@ -95,6 +101,34 @@ export class MaintenanceRequestDao {
       message: HTTP_CODES[200].message,
       data: {
         request: request,
+      },
+    };
+  }
+  async closeMaintenanceRequest(id: string): Promise<Response> {
+    await db.read();
+
+    const request = this.collection.find({ id }).value();
+    if (!request) {
+      throw new HttpException(
+        {
+          code: HTTP_CODES[404].code,
+          message: HTTP_CODES[404].message,
+          data: {
+            id: id,
+          },
+        },
+        HttpStatus.NOT_FOUND
+      );
+    }
+    this.collection
+      .find({ id })
+      .assign({ status: ALL_REQUEST_STATUSES.close })
+      .write();
+    return {
+      code: HTTP_CODES[200].code,
+      message: HTTP_CODES[200].message,
+      data: {
+        message: 'Request has been closed',
       },
     };
   }

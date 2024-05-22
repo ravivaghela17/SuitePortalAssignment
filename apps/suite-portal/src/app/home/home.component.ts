@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import {
   ALL_SERVICE_TYPES,
   MaintenanceRequest,
+  ALL_REQUEST_STATUSES,
 } from '@suiteportal/api-interfaces';
 import {
   FormGroup,
@@ -115,6 +116,7 @@ export class HomeComponent implements OnInit {
       serviceType: formValues.serviceType ?? '',
       summary: formValues.summary ?? '',
       details: formValues.details ?? '',
+      status: ALL_REQUEST_STATUSES.open,
     };
     Object.keys(saveModel).forEach((key) => {
       if (['', null, undefined].includes(saveModel[key])) {

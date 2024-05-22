@@ -21,4 +21,7 @@ export class MaintenanceRequestService {
   async getOpenMaintenanceRequest(): Promise<Response> {
     return await this.maintReqDao.getOpenMaintenances();
   }
+  async closeMaintenanceRequest(id: string): Promise<Response> {
+    return await this.maintReqDao.closeMaintenanceRequest(id);
+  }
 }

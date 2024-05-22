@@ -12,6 +12,16 @@ export const ALL_SERVICE_TYPES = [
   ServiceType.Plumbing,
 ];
 
+export enum RequestStatus {
+  open = 'open',
+  close = 'close',
+}
+
+export const ALL_REQUEST_STATUSES = {
+  open: RequestStatus.open,
+  close: RequestStatus.close,
+};
+
 export interface MaintenanceRequest {
   // Name of the requester
   name: string;
@@ -25,6 +35,8 @@ export interface MaintenanceRequest {
   summary: string;
   // Any extra details
   details?: string;
+  // Request status
+  status: RequestStatus;
 }
 export interface User {
   email: string;

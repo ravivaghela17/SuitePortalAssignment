@@ -5,6 +5,7 @@ import {
   Post,
   Get,
   Param,
+  Put,
 } from '@nestjs/common';
 import { MaintenanceRequest } from '@suiteportal/api-interfaces';
 import { MaintenanceRequestService } from './maintenance-request.service';
@@ -43,5 +44,13 @@ export class MaintenanceRequestController {
       throw new BadRequestException('No id provided');
     }
     return await this.maintenanceRequestService.getMaintenanceRequest(id);
+  }
+
+  @Put('/:id/close')
+  public async closeMaintenanceRequest(@Param('id') id: string) {
+    if (!id) {
+      throw new BadRequestException('Must provide request id');
+    }
+    return await this.maintenanceRequestService.closeMaintenanceRequest(id);
   }
 }
