@@ -21,3 +21,9 @@ body {
 .toast-error {
   background-color: red;
 }
+.full-width {
+  width: 100%;
+}
+mat-form-field {
+  @extend .full-width;
+}
