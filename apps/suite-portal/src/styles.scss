@@ -1,10 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
 
-@import "./theme.scss";
+@import './theme.scss';
 
-html, body { height: 100%; }
-body { margin: 0; font-family: 'Lato', sans-serif; }
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: 'Lato', sans-serif;
+}
 
 :root {
   --sp-margin-size: 16px;
+}
+
+.toast-success {
+  background-color: green;
+}
+.toast-error {
+  background-color: red;
 }

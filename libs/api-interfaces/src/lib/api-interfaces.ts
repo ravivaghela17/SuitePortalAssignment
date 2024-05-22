@@ -6,10 +6,10 @@ export enum ServiceType {
 }
 
 export const ALL_SERVICE_TYPES = [
-  ServiceType.Electrical ,
-  ServiceType.General ,
-  ServiceType.PestControl ,
-  ServiceType.Plumbing ,
+  ServiceType.Electrical,
+  ServiceType.General,
+  ServiceType.PestControl,
+  ServiceType.Plumbing,
 ];
 
 export interface MaintenanceRequest {
@@ -26,4 +26,3 @@ export interface MaintenanceRequest {
   // Any extra details
   details?: string;
 }
-

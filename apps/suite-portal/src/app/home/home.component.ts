@@ -1,16 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { ALL_SERVICE_TYPES } from '@suiteportal/api-interfaces';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import {
+  ALL_SERVICE_TYPES,
+  MaintenanceRequest,
+} from '@suiteportal/api-interfaces';
 import {
   FormGroup,
   Validators,
   FormBuilder,
   FormControl,
   AbstractControl,
+  NgForm,
 } from '@angular/forms';
+import { SuiteApiService } from '../services/suite-api.service';
+import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
+import { SnackBarconfig, SNACK_BAR_TYPES } from '../constants';
+import { tap, first, catchError, finalize } from 'rxjs/operators';
+
 const ERROR_MESSAGES = {
   REQUIRED_FIELD: 'This field is required',
   EMAIL_PATTERN: 'Please enter a valid email address',
+  REQUEST_FAILURE: 'Unable to proceed the request, Please try again',
 };
+const REQUEST_SUCCECSS = 'Request submitted successfully!';
 @Component({
   selector: 'pm-home',
   templateUrl: './home.component.html',
@@ -19,10 +30,53 @@ const ERROR_MESSAGES = {
 export class HomeComponent implements OnInit {
   serviceTypes = ALL_SERVICE_TYPES;
   form: FormGroup;
-  constructor(private readonly fb: FormBuilder) {}
+
+  @ViewChild('ngForm')
+  ngForm: NgForm;
+  constructor(
+    private readonly fb: FormBuilder,
+    private readonly suiteApiSerice: SuiteApiService,
+    private readonly snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
-    this.form = this.createForm();
+    this.createForm();
+  }
+  submitRequest() {
+    if (!this.form.valid) {
+      this.openSnackBar(SNACK_BAR_TYPES.ERROR, ERROR_MESSAGES.REQUEST_FAILURE);
+      return;
+    }
+    const saveModel = this.prepareMaintainceModel(this.form.value);
+
+    this.suiteApiSerice
+      .createMaintenanceRequest(saveModel)
+      .pipe(
+        first(),
+        tap((response) => {
+          if (response) {
+            this.openSnackBar(SNACK_BAR_TYPES.SUCCESS, REQUEST_SUCCECSS);
+          }
+        }),
+        catchError((error) => {
+          const errorMessage = error?.message
+            ? error.message
+            : ERROR_MESSAGES.REQUEST_FAILURE;
+          this.openSnackBar(SNACK_BAR_TYPES.ERROR, errorMessage);
+          return error;
+        }),
+        finalize(() => {
+          this.resetForm();
+        })
+      )
+      .subscribe();
+  }
+  resetForm() {
+    this.form.reset();
+    // setting the error as null since reset function will add the initial validation
+    Object.keys(this.form.controls).forEach((key) => {
+      this.form.get(key).setErrors(null);
+    });
   }
   get unitNumber(): AbstractControl {
     return this.form.get('unitNumber');
@@ -51,8 +105,24 @@ export class HomeComponent implements OnInit {
       ? ERROR_MESSAGES.EMAIL_PATTERN
       : '';
   }
-  private createForm(): FormGroup {
-    const form = this.fb.group({
+  private prepareMaintainceModel(formValues): MaintenanceRequest {
+    const saveModel: MaintenanceRequest = {
+      name: formValues.requesterName ?? '',
+      email: formValues.requesterEmail ?? '',
+      unitNumber: formValues.unitNumber ?? '',
+      serviceType: formValues.serviceType ?? '',
+      summary: formValues.summary ?? '',
+      details: formValues.details ?? '',
+    };
+    Object.keys(saveModel).forEach((key) => {
+      if (['', null, undefined].includes(saveModel[key])) {
+        delete saveModel[key];
+      }
+    });
+    return saveModel;
+  }
+  private createForm(): void {
+    this.form = this.fb.group({
       unitNumber: ['', [Validators.required]],
       requesterName: ['', [Validators.required]],
       requesterEmail: [
@@ -66,6 +136,12 @@ export class HomeComponent implements OnInit {
       summary: ['', [Validators.required]],
       details: [''],
     });
-    return form;
+  }
+  openSnackBar(snackBarType: string, message: string) {
+    const config = {
+      ...SnackBarconfig,
+      panelClass: snackBarType,
+    } as MatSnackBarConfig;
+    this.snackBar.open(message, '', config);
   }
 }
