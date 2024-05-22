@@ -11,16 +11,30 @@
           <mat-form-field>
             <mat-label>Email</mat-label>
             <input matInput type="text" formControlName="email" />
+            <mat-error *ngIf="email.touched && email.invalid">
+              {{ getEmailErrorMessage() }}
+            </mat-error>
           </mat-form-field>
           <mat-form-field>
             <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password" />
+            <input
+              matInput
+              [type]="hidePassword ? 'password' : 'text'"
+              formControlName="password"
+            />
+            <mat-icon matSuffix (click)="hidePassword = !hidePassword">{{
+              hidePassword ? 'visibility' : 'visibility_off'
+            }}</mat-icon>
+            <mat-error *ngIf="password.touched && password.invalid">
+              {{ getPasswordErrorMessage() }}
+            </mat-error>
           </mat-form-field>
 
           <button
             mat-raised-button
             color="primary"
             class="full-width"
+            [disabled]="!form.valid"
             (click)="login()"
           >
             Login
