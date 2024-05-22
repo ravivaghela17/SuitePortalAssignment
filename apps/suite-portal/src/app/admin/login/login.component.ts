@@ -35,6 +35,10 @@ export class LoginComponent implements OnInit {
   }
   login() {
     if (!this.form.valid) {
+      this.utilService.openSnackBar(
+        SNACK_BAR_TYPES.ERROR,
+        ERROR_MESSAGES.REQUEST_FAILURE
+      );
       return;
     }
     const user: User = {

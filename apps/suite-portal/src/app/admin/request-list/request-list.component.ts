@@ -31,6 +31,29 @@ export class RequestListComponent implements OnInit {
   ngOnInit(): void {
     this.requestes$ = this.getAllOpenMaintenanceRequests();
   }
+  closeRequest(id: string): void {
+    if (!id) {
+      this.utilService.openSnackBar(
+        SNACK_BAR_TYPES.ERROR,
+        ERROR_MESSAGES.REQUEST_FAILURE
+      );
+      return;
+    }
+    if (confirm('Are you sure to close the request ')) {
+      this.maintenanceRequestApiService
+        .closeMaintenanceRequest(id)
+        .pipe(
+          catchError((error) => {
+            const errorMessage = error?.message
+              ? error.message
+              : ERROR_MESSAGES.REQUEST_FAILURE;
+            this.utilService.openSnackBar(SNACK_BAR_TYPES.ERROR, errorMessage);
+            return error;
+          })
+        )
+        .subscribe();
+    }
+  }
   getAllOpenMaintenanceRequests(): Observable<MaintenanceRequest[]> {
     return this.maintenanceRequestApiService.getOpenMaintenanceRequest().pipe(
       first(),

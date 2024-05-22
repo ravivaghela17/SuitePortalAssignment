@@ -108,6 +108,7 @@ export class MaintenanceRequestDao {
     await db.read();
 
     const request = this.collection.find({ id }).value();
+
     if (!request) {
       throw new HttpException(
         {
