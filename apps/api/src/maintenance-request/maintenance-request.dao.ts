@@ -13,14 +13,13 @@ export interface MaintenanceRequestData {
   requests: MaintenanceRequestDB[];
 }
 
-const adapter = new FileSync<MaintenanceRequestDB>('./db/maint-requests.json')
-const db = low(adapter)
+const adapter = new FileSync<MaintenanceRequestDB>('./db/maint-requests.json');
+const db = low(adapter);
 
 db.defaults({ requests: [] }).write();
 
 @Injectable()
 export class MaintenanceRequestDao {
-
   private get collection(): any {
     return db.get('requests');
   }
@@ -37,7 +36,7 @@ export class MaintenanceRequestDao {
         ...maintenanceRequest,
         submittedAt: new Date(),
       })
-      .write()
+      .write();
     return id;
   }
 
