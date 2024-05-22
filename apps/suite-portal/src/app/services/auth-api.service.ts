@@ -30,4 +30,9 @@ export class AuthApiService {
       })
     );
   }
+  getSessionUser(): User {
+    const item = sessionStorage.getItem('ADMIN');
+    const user = JSON.parse(item) as Storage;
+    return user ? user.object : undefined;
+  }
 }

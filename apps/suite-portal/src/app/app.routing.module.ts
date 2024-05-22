@@ -4,6 +4,7 @@ import { HomeComponent } from './home/home.component';
 import { HomeModule } from './home/home.module';
 import { LoginComponent } from './admin/login/login.component';
 import { RequestListComponent } from './admin/request-list/request-list.component';
+import { AuthGuardService } from './core/guards/auth-guard.service';
 const routes: Routes = [
   {
     path: 'home',
@@ -16,6 +17,7 @@ const routes: Routes = [
   {
     path: 'requests',
     component: RequestListComponent,
+    canActivate: [AuthGuardService],
   },
   {
     path: '**',
