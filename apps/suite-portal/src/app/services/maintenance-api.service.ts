@@ -1,19 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { MaintenanceRequest } from '@suiteportal/api-interfaces';
-interface Response {
-  status: number;
-  code: number;
-  message: string;
-  userId: string;
-  data: any;
-}
+import { MaintenanceRequest, Response } from '@suiteportal/api-interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
-export class SuiteApiService {
+export class MaintenanceRequestApiService {
   constructor(private readonly http: HttpClient) {}
   createMaintenanceRequest(body: MaintenanceRequest): Observable<Response> {
     return this.http.post<Response>('/api/maintenance-requests', body);

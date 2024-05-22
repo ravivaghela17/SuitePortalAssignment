@@ -11,7 +11,7 @@ import {
   AbstractControl,
   NgForm,
 } from '@angular/forms';
-import { SuiteApiService } from '../services/suite-api.service';
+import { MaintenanceRequestApiService } from '../services/maintenance-api.service';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
 import { SnackBarconfig, SNACK_BAR_TYPES } from '../constants';
 import { tap, first, catchError, finalize } from 'rxjs/operators';
@@ -35,7 +35,7 @@ export class HomeComponent implements OnInit {
   ngForm: NgForm;
   constructor(
     private readonly fb: FormBuilder,
-    private readonly suiteApiSerice: SuiteApiService,
+    private readonly maintenanceRequestService: MaintenanceRequestApiService,
     private readonly snackBar: MatSnackBar
   ) {}
 
@@ -49,7 +49,7 @@ export class HomeComponent implements OnInit {
     }
     const saveModel = this.prepareMaintainceModel(this.form.value);
 
-    this.suiteApiSerice
+    this.maintenanceRequestService
       .createMaintenanceRequest(saveModel)
       .pipe(
         first(),

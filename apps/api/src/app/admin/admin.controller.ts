@@ -13,7 +13,7 @@ import { AdminService } from './admin.service';
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
-  @Post('/')
+  @Post('/login')
   public async validateUser(@Body() user: User) {
     if (!user.email) {
       throw new BadRequestException('Must enter a email');

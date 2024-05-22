@@ -7,17 +7,22 @@
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <form class="maint-form">
+        <form [formGroup]="form" class="maint-form">
           <mat-form-field>
             <mat-label>Email</mat-label>
-            <input matInput type="text" />
+            <input matInput type="text" formControlName="email" />
           </mat-form-field>
           <mat-form-field>
             <mat-label>Password</mat-label>
-            <input matInput type="password" />
+            <input matInput type="password" formControlName="password" />
           </mat-form-field>
 
-          <button mat-raised-button color="primary" class="full-width">
+          <button
+            mat-raised-button
+            color="primary"
+            class="full-width"
+            (click)="login()"
+          >
             Login
           </button>
         </form>
